@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        let opened = []
+        $.getJSON('data.json', function(data) {
+            let body = document.querySelector('body')
+            let container = document.createElement('div')
+            container.setAttribute('class', 'container')
+            body.appendChild(container)
+            Object.values(data).forEach(firstParent => {
+                const {id, name, children} = firstParent
+                let majorParent = document.createElement('ul')
+                majorParent.setAttribute('id', id)
+                majorParent.innerHTML = name
+                container.appendChild(majorParent);
+
+                let iconArrow = document.createElement('i')
+                iconArrow.setAttribute('class', 'far fa-angle-down')
+                majorParent.appendChild(iconArrow)
+
+                iconArrow.style.color = 'black';
+                iconArrow.style.fontSize = '50px';
+
+                majorParent.style.cursor = 'pointer';
+                majorParent.style.fontFamily = 'Arial';
+                majorParent.style.padding = '5px';
+                majorParent.style.marginLeft = '26px';
+                majorParent.style.width = '600px';
+
+                majorParent.addEventListener('click', (e) => {
+                    getChild(data, e.target.id, majorParent)
+                    
+                })
+            })
+        
+        })
+        function getChild(list, id, element){
+            let resultChildren = {}
+            for (const person in list) {
+                if(list[person].children){
+                    if(list[person].id === id) {
+                        if(opened.includes(id)){
+                            const parent = document.getElementById(id)
+                            Object.values(parent.children).forEach(openedChild => openedChild.remove())
+                            opened.splice(opened.indexOf(id), 1)
+                        }else{
+                            opened.push(id)
+                            Object.values(list[person].children).forEach(child => {
+                                const {id, name, children} = child
+                                let majorParent = document.createElement('ul')
+                                majorParent.setAttribute('id', id)
+                                majorParent.innerHTML = name
+                                element.appendChild(majorParent);
+
+                                majorParent.style.cursor = 'pointer';
+                                majorParent.style.fontFamily = 'Arial';
+                                majorParent.style.padding = '5px';
+                                majorParent.style.marginLeft = '26px';
+                                majorParent.style.width = '600px';
+                                majorParent.addEventListener('click', (e) => {
+                                    e.target.textContent
+                                    getChild(list[person].children, e.target.id, majorParent)
+                                    })
+                            })
+                        }
+                    }
+                }
+                
+            }
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>
+
