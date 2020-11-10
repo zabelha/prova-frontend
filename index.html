@@ -6,73 +6,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <script defer src="./icon/js/all.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        let opened = []
-        $.getJSON('data.json', function(data) {
+
+        const url = "https://raw.githubusercontent.com/HiPlatform/prova-frontend/master/data.json"
+
+        fetch(url)
+        .then(res => res.json())
+        .then(resp => getJSON(resp))
+
+        function getJSON(data) {
+
             let body = document.querySelector('body')
             let container = document.createElement('div')
             container.setAttribute('class', 'container')
             body.appendChild(container)
+
             Object.values(data).forEach(firstParent => {
+
                 const {id, name, children} = firstParent
                 let majorParent = document.createElement('ul')
                 majorParent.setAttribute('id', id)
+                majorParent.setAttribute('class', 'majorParent')
                 majorParent.innerHTML = name
                 container.appendChild(majorParent);
 
-                let iconArrow = document.createElement('i')
-                iconArrow.setAttribute('class', 'far fa-angle-down')
-                majorParent.appendChild(iconArrow)
+                             
+                let check = document.createElement('input')
+                check.setAttribute('type', 'checkbox')
+                check.setAttribute('class', 'checkmain')
+                majorParent.appendChild(check)
 
-                iconArrow.style.color = 'black';
-                iconArrow.style.fontSize = '50px';
+                addArrowIcon(id)
+                
+
+                check.style.float = 'left';
+                check.style.marginRight = '7px';
 
                 majorParent.style.cursor = 'pointer';
                 majorParent.style.fontFamily = 'Arial';
                 majorParent.style.padding = '5px';
-                majorParent.style.marginLeft = '26px';
+                majorParent.style.marginLeft = '45px';
                 majorParent.style.width = '600px';
 
+
                 majorParent.addEventListener('click', (e) => {
+
                     getChild(data, e.target.id, majorParent)
-                    
                 })
-            })
-        
-        })
+            })   
+        }
+
+        let opened = []
         function getChild(list, id, element){
             let resultChildren = {}
+
             for (const person in list) {
                 if(list[person].children){
                     if(list[person].id === id) {
                         if(opened.includes(id)){
                             const parent = document.getElementById(id)
                             Object.values(parent.children).forEach(openedChild => openedChild.remove())
+
+                            addCheck(id)
+                            addArrowIcon(id)
+
                             opened.splice(opened.indexOf(id), 1)
                         }else{
                             opened.push(id)
                             Object.values(list[person].children).forEach(child => {
                                 const {id, name, children} = child
                                 let majorParent = document.createElement('ul')
+
                                 majorParent.setAttribute('id', id)
+                                majorParent.setAttribute('class', 'majorParent')
                                 majorParent.innerHTML = name
                                 element.appendChild(majorParent);
 
+                                addArrowIcon(id)
+
+                                let check = document.createElement('input')
+
+                                check.setAttribute('type', 'checkbox')
+                                check.setAttribute('class', 'checkchild')
+                                majorParent.appendChild(check)
+
+                                check.style.float = 'left';
+                                check.style.marginRight = '7px';
+
+                                checkmain = majorParent.parentElement
+                                checkmain.children[0].addEventListener('click', (e) => {
+                                    
+                                    checkChild(majorParent,check)
+                                
+                                 })
+                                
+
+                                 checkChild(majorParent,check)
+
+
                                 majorParent.style.cursor = 'pointer';
                                 majorParent.style.fontFamily = 'Arial';
-                                majorParent.style.padding = '5px';
+                                majorParent.style.padding = '8px';
                                 majorParent.style.marginLeft = '26px';
-                                majorParent.style.width = '600px';
+                                majorParent.style.width = '700px';
+                                // majorParent.style.borderBottom = "1px solid #f5f5f5"
                                 majorParent.addEventListener('click', (e) => {
                                     e.target.textContent
                                     getChild(list[person].children, e.target.id, majorParent)
+                                    
                                     })
                             })
                         }
                     }
                 }
                 
+            }
+        }
+
+        function addCheck(id) {
+            let majorParent = document.getElementById(id)
+            let check = document.createElement('input')
+            check.setAttribute('type', 'checkbox')
+            majorParent.appendChild(check)
+            check.checked = true
+
+            check.style.float = 'left';
+            check.style.marginRight = '7px';
+
+
+        }
+
+        function addArrowIcon(id) {
+            let majorParent = document.getElementById(id)
+            let icon = document.createElement('i')
+                icon.setAttribute('class', 'fas fa-angle-down')
+                icon.style.color = "#808080"
+                icon.style.float = "right"
+                icon.style.marginTop = "8px"
+                majorParent.appendChild(icon)
+        }
+
+        function checkChild(child, check){
+
+            let main = child.parentElement
+            let checkedChild = check
+
+            if(main.children[0].checked === true){
+                checkedChild.checked = true
+            } else{
+                checkedChild.checked = false
             }
         }
     </script>
